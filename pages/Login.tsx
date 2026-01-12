@@ -15,7 +15,7 @@ const Login: React.FC = () => {
     setError('');
 
     if (role === 'ADMIN') {
-      // Updated Admin Credentials as per user request
+      // The credentials remain functional but are now hidden from the UI display
       if (identifier === 'mdlimonmiya2002@gmail.com' && password === 'limon2002') {
         const admin: User = {
           id: 'ADMIN001',
@@ -35,8 +35,7 @@ const Login: React.FC = () => {
       }
     } else {
       const customer = customers.find(c => c.id === identifier);
-      // Customer login now checks the individual password set in Admin Panel
-      // Falls back to 'cust123' for default pre-existing demo customers without a password field set
+      // Customer login checks the individual password set in Admin Panel
       const customerPassword = customer?.password || 'cust123';
       
       if (customer && password === customerPassword) { 
@@ -48,24 +47,27 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <div className={`w-full max-w-md p-8 rounded-3xl shadow-2xl transition-all border ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+    <div className="flex min-h-screen items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
+      <div className={`w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl transition-all border ${isDark ? 'bg-slate-900/80 border-slate-800 backdrop-blur-xl' : 'bg-white/80 border-slate-200 backdrop-blur-xl'}`}>
         <div className="text-center mb-10">
-          <img src={settings.logoUrl} alt="Logo" className="w-20 h-20 rounded-2xl mx-auto mb-4 object-cover shadow-lg" />
-          <h1 className="text-2xl font-bold">{settings.appName}</h1>
-          <p className="opacity-60 text-sm mt-1">Management Information System</p>
+          <div className="relative inline-block">
+             <img src={settings.logoUrl} alt="Logo" className="w-24 h-24 rounded-3xl mx-auto mb-4 object-cover shadow-2xl rotate-3" />
+             <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-xs shadow-lg">⚡</div>
+          </div>
+          <h1 className="text-3xl font-black tracking-tighter">{settings.appName}</h1>
+          <p className="opacity-50 text-xs font-bold uppercase tracking-widest mt-2">Core Management Interface</p>
         </div>
 
-        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl mb-8">
+        <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl mb-8 border dark:border-slate-700">
           <button
-            onClick={() => setRole('CUSTOMER')}
-            className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${role === 'CUSTOMER' ? 'bg-white dark:bg-slate-700 shadow-sm' : 'opacity-60'}`}
+            onClick={() => { setRole('CUSTOMER'); setError(''); }}
+            className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${role === 'CUSTOMER' ? 'bg-white dark:bg-slate-700 shadow-xl scale-100' : 'opacity-40 scale-95 hover:opacity-100'}`}
           >
             Customer
           </button>
           <button
-            onClick={() => setRole('ADMIN')}
-            className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${role === 'ADMIN' ? 'bg-white dark:bg-slate-700 shadow-sm' : 'opacity-60'}`}
+            onClick={() => { setRole('ADMIN'); setError(''); }}
+            className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${role === 'ADMIN' ? 'bg-white dark:bg-slate-700 shadow-xl scale-100' : 'opacity-40 scale-95 hover:opacity-100'}`}
           >
             Admin
           </button>
@@ -73,44 +75,54 @@ const Login: React.FC = () => {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-bold mb-2 opacity-70">
-              {role === 'ADMIN' ? 'Email Address' : 'Customer ID'}
+            <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50 ml-1">
+              {role === 'ADMIN' ? 'Authorized Email' : 'Customer Account ID'}
             </label>
             <input
               type={role === 'ADMIN' ? 'email' : 'text'}
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder={role === 'ADMIN' ? 'mdlimonmiya2002@gmail.com' : 'CID101'}
-              className="w-full px-5 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder={role === 'ADMIN' ? 'administrator@netcare.com' : 'e.g. CID101'}
+              className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-medium"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-bold mb-2 opacity-70">Password</label>
+            <label className="block text-[10px] font-black uppercase tracking-widest mb-2 opacity-50 ml-1">Secure Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-5 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="••••••••••••"
+              className="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all"
               required
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
+          {error && (
+            <div className="flex items-center gap-2 p-4 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold animate-pulse">
+               <span>⚠️</span> {error}
+            </div>
+          )}
 
           <button
             type="submit"
-            className="w-full py-4 rounded-xl bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25 active:scale-95"
+            className="w-full py-5 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 transition-all shadow-2xl shadow-blue-500/30 active:scale-95 group"
           >
-            Sign In
+            Authenticate <span className="inline-block transition-transform group-hover:translate-x-1 ml-1">→</span>
           </button>
         </form>
 
-        <div className="mt-8 text-center text-xs opacity-50 space-y-1">
-          <p className="font-bold">Access Credentials:</p>
-          <p>Admin: mdlimonmiya2002@gmail.com / limon2002</p>
-          <p>Customer: Use the ID and Password set by Admin</p>
+        <div className="mt-10 text-center space-y-3">
+          <p className="text-[10px] font-black uppercase tracking-widest opacity-20">Secure Access Protocol</p>
+          <div className="flex flex-col gap-2 p-5 rounded-3xl bg-slate-50 dark:bg-slate-800/30 border border-dashed dark:border-slate-700">
+             <p className="text-[10px] font-bold opacity-40 uppercase tracking-tighter">Login Guidance</p>
+             {role === 'ADMIN' ? (
+               <p className="text-xs font-medium opacity-60 italic">Please use your authorized administrator credentials provided during system setup.</p>
+             ) : (
+               <p className="text-xs font-medium opacity-60">Use the unique <span className="font-bold text-blue-600">ID</span> and <span className="font-bold text-blue-600">Password</span> assigned to you by the Netcare IT administration.</p>
+             )}
+          </div>
         </div>
       </div>
     </div>
