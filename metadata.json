@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Netcare IT Alamdanga",
+  "description": "A multi-role ISP management system featuring comprehensive admin and customer panels with billing, support, entertainment links, and multi-language support.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
