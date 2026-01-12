@@ -146,6 +146,7 @@ const Layout: React.FC = () => {
   const { user, lang, setLang, isDark, setIsDark, t, settings, setUser, notices } = useApp();
   const location = useLocation();
   const [showPopup, setShowPopup] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const urgent = notices.find(n => n.isUrgent);
@@ -174,16 +175,40 @@ const Layout: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <aside className={`hidden md:flex flex-col w-64 ${isDark ? 'bg-slate-800 border-r border-slate-700' : 'bg-white border-r border-slate-200'}`}>
-        <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
-          <img src={settings.logoUrl} alt="Logo" className="w-10 h-10 rounded-lg object-cover" />
-          <h1 className="font-bold text-lg leading-tight">{settings.appName}</h1>
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-300"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-64 flex flex-col transition-transform duration-300 ease-in-out transform
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:relative md:translate-x-0 md:flex
+        ${isDark ? 'bg-slate-800 border-r border-slate-700' : 'bg-white border-r border-slate-200'}
+      `}>
+        <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <img src={settings.logoUrl} alt="Logo" className="w-10 h-10 rounded-lg object-cover" />
+            <h1 className="font-bold text-lg leading-tight">{settings.appName}</h1>
+          </div>
+          {/* Mobile Close Button */}
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
+          >
+            ✕
+          </button>
         </div>
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map(item => (
             <Link
               key={item.path}
               to={item.path}
+              onClick={() => setIsMobileMenuOpen(false)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                 location.pathname === item.path
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
@@ -208,8 +233,15 @@ const Layout: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <header className={`h-16 flex items-center justify-between px-6 border-b ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
           <div className="flex items-center gap-4">
-            <button className="md:hidden text-2xl">☰</button>
-            <h2 className="font-bold text-xl">{navItems.find(n => n.path === location.pathname)?.label || t.dashboard}</h2>
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden text-2xl p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            >
+              ☰
+            </button>
+            <h2 className="font-bold text-xl truncate max-w-[150px] sm:max-w-none">
+              {navItems.find(n => n.path === location.pathname)?.label || t.dashboard}
+            </h2>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -225,18 +257,18 @@ const Layout: React.FC = () => {
               {isDark ? '☀️' : '🌙'}
             </button>
             <div className="flex items-center gap-3 pl-3 border-l dark:border-slate-700">
-              <div className="text-right hidden sm:block">
+              <div className="text-right hidden lg:block">
                 <p className="text-sm font-bold">{user?.name}</p>
                 <p className="text-[10px] opacity-60 uppercase">{user?.role}</p>
               </div>
-              <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+              <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">
                 {user?.name.charAt(0)}
               </div>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           <Routes>
              <Route path="/" element={user?.role === 'ADMIN' ? <AdminDashboard /> : <CustomerProfile />} />
              <Route path="/customers" element={<CustomerManagement />} />
@@ -252,7 +284,7 @@ const Layout: React.FC = () => {
       </div>
 
       {showPopup && notices.filter(n => n.isUrgent).length > 0 && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className={`w-full max-w-md rounded-2xl shadow-2xl p-6 ${isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}`}>
             <div className="flex items-center gap-3 mb-4 text-red-500">
               <span className="text-3xl">⚠️</span>
