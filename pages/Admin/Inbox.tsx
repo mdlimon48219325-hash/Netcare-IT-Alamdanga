@@ -1,13 +1,23 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useApp } from '../../App';
 import { Message } from '../../types';
 
 const AdminInbox: React.FC = () => {
   const { customers, isDark, messages, setMessages } = useApp();
+  const location = useLocation();
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Check for auto-select from navigation state
+  useEffect(() => {
+    const state = location.state as { autoSelectId?: string } | null;
+    if (state?.autoSelectId) {
+      setSelectedCustomerId(state.autoSelectId);
+    }
+  }, [location]);
 
   const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
   
@@ -49,7 +59,7 @@ const AdminInbox: React.FC = () => {
           {customers.length > 0 ? customers.map(c => {
             const customerMsgs = messages.filter(m => m.from === c.id || m.to === c.id);
             const lastMsg = customerMsgs[customerMsgs.length - 1];
-            const hasUnread = customerMsgs.some(m => m.from === c.id && !m.isAdmin); // Simplified unread logic
+            const hasUnread = customerMsgs.some(m => m.from === c.id && !m.isAdmin);
 
             return (
               <button
